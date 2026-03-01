@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "./supabaseClient";
 
 interface Part {
   name: string;
@@ -33,19 +34,18 @@ const AddProject: React.FC<AddProjectModalProps> = ({ onClose, onUserAdded }) =>
     if (!projectName.trim()) return;
 
     try {
-      await fetch("http://localhost:3000/projects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          project: projectName,
-          parts: parts.map((p) => [p.name, p.price]),
-        }),
-      });
+      // Supabase insert
+      await supabase
+        .from("projects")
+        .insert([{ project: projectName, parts: parts.map((p) => [p.name, p.price]) }]);
 
+      // Reset form
       setProjectName("");
       setParts([]);
       setNewPartName("");
       setNewPartPrice("");
+
+      // Refresh parent
       onUserAdded?.();
       onClose();
     } catch (error) {

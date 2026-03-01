@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "./supabaseClient";
 
 export interface Part {
   name: string;
@@ -21,15 +22,29 @@ const AddPartModule: React.FC<AddPartModuleProps> = ({ projectId, onPartAdded })
     if (isNaN(price)) return;
 
     try {
-      await fetch(`http://localhost:3000/projects/${projectId}/parts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: partName.trim(), price }),
-      });
+      // 1️⃣ Fetch current project parts
+      const { data: project, error: fetchError } = await supabase
+        .from("projects")
+        .select("parts")
+        .eq("id", projectId)
+        .single();
+      if (fetchError) throw fetchError;
 
+      // 2️⃣ Add new part to parts array
+      const newParts = [...project.parts, [partName.trim(), price]];
+
+      // 3️⃣ Update project in Supabase
+      const { error: updateError } = await supabase
+        .from("projects")
+        .update({ parts: newParts })
+        .eq("id", projectId);
+      if (updateError) throw updateError;
+
+      // 4️⃣ Reset input fields
       setPartName("");
       setPartPrice("");
 
+      // 5️⃣ Notify parent to refresh
       onPartAdded?.();
     } catch (err) {
       console.error(err);
