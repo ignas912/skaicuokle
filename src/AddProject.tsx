@@ -34,10 +34,20 @@ const AddProject: React.FC<AddProjectModalProps> = ({ onClose, onUserAdded }) =>
     if (!projectName.trim()) return;
 
     try {
-      // Supabase insert
-      await supabase
+      // ✅ Insert project into Supabase
+      const { data, error } = await supabase
         .from("projects")
-        .insert([{ project: projectName, parts: parts.map((p) => [p.name, p.price]) }]);
+        .insert([
+          { project: projectName, parts: parts.map((p) => [p.name, p.price]) }
+        ])
+        .select(); // returns the inserted row with generated ID
+
+      if (error) {
+        console.error("Supabase insert error:", error);
+        return;
+      }
+
+      console.log("Inserted project:", data);
 
       // Reset form
       setProjectName("");
@@ -45,11 +55,11 @@ const AddProject: React.FC<AddProjectModalProps> = ({ onClose, onUserAdded }) =>
       setNewPartName("");
       setNewPartPrice("");
 
-      // Refresh parent
+      // Notify parent to refresh projects
       onUserAdded?.();
       onClose();
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error("Unexpected error:", err);
     }
   };
 
