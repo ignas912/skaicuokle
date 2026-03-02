@@ -403,21 +403,14 @@ body {
   width: 70vw;
   max-height: 70vh;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
   padding-right: 8px;
 }
 
+/* Hide scrollbar for Chrome, Safari and Opera */
 .parts-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.parts-list::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
-}
-
-.parts-list::-webkit-scrollbar-thumb {
-  background: rgba(127, 255, 212, 0.5);
-  border-radius: 3px;
+  display: none;
 }
 
 /* Part item */
@@ -583,324 +576,6 @@ body {
   font-weight: 600;
   user-select: none;
   font-style: italic;
-}
-
-/* ===== RESPONSIVE DESIGN ===== */
-
-/* Tablet and small desktop (768px - 1024px) */
-@media screen and (max-width: 1024px) {
-  .first-left {
-    width: 30vw;
-  }
-  
-  .second-left {
-    left: 30vw;
-    width: 70vw;
-  }
-  
-  .list {
-    width: calc(30vw - 16px);
-  }
-  
-  .card {
-    width: calc(30vw - 48px);
-  }
-  
-  .top-bar {
-    width: 65vw;
-  }
-  
-  .parts-list {
-    width: 65vw;
-  }
-  
-  .part-info span:first-child {
-    min-width: 150px;
-  }
-}
-
-/* Mobile landscape and small tablets (481px - 767px) */
-@media screen and (max-width: 767px) {
-  body {
-    overflow: auto;
-    background-size: 30px 30px;
-  }
-  
-  .first-left {
-    position: relative;
-    width: 100vw;
-    height: auto;
-    min-height: 40vh;
-    left: 0;
-    backdrop-filter: blur(2px);
-  }
-  
-  .second-left {
-    position: relative;
-    left: 0;
-    width: 100vw;
-    height: auto;
-    min-height: 60vh;
-  }
-  
-  .controls {
-    width: calc(100vw - 32px);
-    margin: 0 auto;
-  }
-  
-  .list {
-    width: calc(100vw - 32px);
-    height: auto;
-    max-height: 35vh;
-    margin: 0 auto;
-  }
-  
-  .card {
-    width: calc(100vw - 64px);
-    max-width: none;
-    margin: 8px auto;
-  }
-  
-  .top-bar {
-    top: 2vh;
-    left: 2vw;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1vh;
-    width: calc(96vw - 2rem);
-    margin: 0 auto;
-  }
-  
-  .title {
-    font-size: 1.25rem;
-    width: 100%;
-  }
-  
-  .add-part-module {
-    margin-left: 0;
-    width: 100%;
-  }
-  
-  .add-part-form {
-    width: 100%;
-  }
-  
-  .parts-list {
-    top: 3vh;
-    left: 2vw;
-    width: calc(96vw - 2rem);
-    max-height: 50vh;
-  }
-  
-  .part {
-    width: calc(96vw - 3rem);
-  }
-  
-  .part-info {
-    gap: 1rem;
-  }
-  
-  .part-info span:first-child {
-    min-width: 120px;
-  }
-}
-
-/* Mobile portrait (480px and below) */
-@media screen and (max-width: 480px) {
-  .controls {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .btn, .logout-btn-small {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .card {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-  }
-  
-  .card span {
-    max-width: 100%;
-  }
-  
-  .view-btn {
-    width: 100%;
-  }
-  
-  .title {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
-  }
-  
-  .price {
-    display: inline-block;
-  }
-  
-  .part {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  
-  .part-info {
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  .part-info span:first-child {
-    min-width: auto;
-  }
-  
-  .remove-part-btn {
-    align-self: flex-end;
-  }
-  
-  .modal-content {
-    padding: 1rem;
-    width: 95%;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  
-  .modal-actions {
-    flex-direction: column-reverse;
-  }
-  
-  .cancel-btn, .submit-btn {
-    width: 100%;
-  }
-  
-  .login-card {
-    padding: 1.5rem;
-    width: 90%;
-  }
-  
-  .login-title {
-    font-size: 1.5rem;
-  }
-}
-
-/* Small mobile (320px and below) */
-@media screen and (max-width: 320px) {
-  .title {
-    font-size: 1rem;
-  }
-  
-  .price {
-    font-size: 1rem;
-  }
-  
-  .card {
-    padding: 10px;
-  }
-  
-  .part {
-    padding: 8px 10px;
-  }
-  
-  .part-info {
-    font-size: 0.9rem;
-  }
-  
-  .login-title {
-    font-size: 1.25rem;
-  }
-}
-
-/* Touch-friendly adjustments for mobile */
-@media (hover: none) and (pointer: coarse) {
-  .btn, .view-btn, .add-part-btn, .save-btn, 
-  .cancel-btn, .submit-btn, .remove-part-btn,
-  .logout-btn-small, .close-btn {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  input, select, textarea {
-    font-size: 16px !important;
-  }
-  
-  .card, .part {
-    padding: 16px;
-  }
-}
-
-/* High-resolution screens and large desktops */
-@media screen and (min-width: 1440px) {
-  .first-left {
-    width: 20vw;
-  }
-  
-  .second-left {
-    left: 20vw;
-    width: 80vw;
-  }
-  
-  .list {
-    width: calc(20vw - 16px);
-  }
-  
-  .card {
-    width: calc(20vw - 48px);
-  }
-  
-  .title {
-    font-size: 2rem;
-  }
-  
-  .price {
-    font-size: 1.5rem;
-  }
-  
-  .top-bar {
-    width: 75vw;
-  }
-  
-  .parts-list {
-    width: 75vw;
-  }
-}
-
-/* Print styles */
-@media print {
-  body {
-    background: white;
-    overflow: visible;
-  }
-  
-  .first-left, .second-left {
-    position: relative;
-    width: 100%;
-    height: auto;
-    left: 0;
-    background: none;
-    backdrop-filter: none;
-  }
-  
-  .controls, .btn, .view-btn, .add-part-module, 
-  .remove-part-btn, .modal-overlay, .logout-btn-small {
-    display: none !important;
-  }
-  
-  .card, .part {
-    background: white;
-    color: black;
-    border: 1px solid #ccc;
-    page-break-inside: avoid;
-  }
-  
-  .card span, .part, .part-info span {
-    color: black;
-  }
-  
-  .price {
-    color: #2e7d32;
-  }
 }
 
 /* Add Part Module Styles */
@@ -1113,11 +788,270 @@ body {
   cursor: not-allowed;
 }
 
-/* Mobile responsive */
-@media screen and (max-width: 768px) {
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Tablet and small desktop (768px - 1024px) */
+@media screen and (max-width: 1024px) {
+  .first-left {
+    width: 30vw;
+  }
+  
+  .second-left {
+    left: 30vw;
+    width: 70vw;
+  }
+  
+  .list {
+    width: calc(30vw - 16px);
+  }
+  
+  .card {
+    width: calc(30vw - 48px);
+  }
+  
+  .top-bar {
+    width: 65vw;
+  }
+  
+  .parts-list {
+    width: 65vw;
+  }
+  
+  .part-info span:first-child {
+    min-width: 150px;
+  }
+}
+
+/* Mobile landscape and small tablets (481px - 767px) */
+@media screen and (max-width: 767px) {
+  body {
+    overflow: auto;
+    background-size: 30px 30px;
+  }
+  
+  .first-left {
+    position: relative;
+    width: 100vw;
+    height: auto;
+    min-height: 40vh;
+    left: 0;
+    backdrop-filter: blur(2px);
+  }
+  
+  .second-left {
+    position: relative;
+    left: 0;
+    width: 100vw;
+    height: auto;
+    min-height: 60vh;
+  }
+  
+  .controls {
+    width: calc(100vw - 32px);
+    margin: 0 auto;
+  }
+  
+  .list {
+    width: calc(100vw - 32px);
+    height: auto;
+    max-height: 35vh;
+    margin: 0 auto;
+  }
+  
+  .card {
+    width: calc(100vw - 64px);
+    max-width: none;
+    margin: 8px auto;
+  }
+  
+  .top-bar {
+    top: 2vh;
+    left: 2vw;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1vh;
+    width: calc(96vw - 2rem);
+    margin: 0 auto;
+  }
+  
+  .title {
+    font-size: 1.25rem;
+    width: 100%;
+  }
+  
+  .add-part-module {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .add-part-form {
+    width: 100%;
+  }
+  
+  /* Mobile parts list */
+  .parts-list {
+    top: 3vh;
+    left: 0;
+    width: 100vw;
+    max-height: 50vh;
+    padding: 0 12px;
+    box-sizing: border-box;
+  }
+  
+  .part {
+    width: calc(100vw - 32px);
+    margin: 8px auto;
+    padding: 14px 18px;
+    gap: 12px;
+    background: rgba(40, 40, 40, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .part-info {
+    gap: 1rem;
+    flex: 1;
+  }
+  
+  .part-info span:first-child {
+    min-width: 120px;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  
+  .part-info span:last-child {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  
+  .remove-part-btn {
+    font-size: 20px;
+    padding: 8px;
+    background: rgba(255, 77, 79, 0.1);
+    border-radius: 8px;
+  }
+}
+
+/* Mobile portrait (480px and below) */
+@media screen and (max-width: 480px) {
+  .controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .btn, .logout-btn-small {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .card {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .card span {
+    max-width: 100%;
+  }
+  
+  .view-btn {
+    width: 100%;
+  }
+  
+  .title {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .price {
+    display: inline-block;
+  }
+  
+  /* Mobile parts list */
+  .parts-list {
+    top: 2vh;
+    max-height: 55vh;
+    padding: 0 10px;
+  }
+  
+  .part {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    margin: 6px auto;
+    width: calc(100vw - 24px);
+  }
+  
+  .part-info {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  
+  .part-info span:first-child {
+    min-width: auto;
+    font-size: 1rem;
+    flex: 1;
+  }
+  
+  .part-info span:last-child {
+    font-size: 1.2rem;
+    text-align: right;
+  }
+  
+  .remove-part-btn {
+    align-self: flex-end;
+    width: 100%;
+    justify-content: center;
+    padding: 10px;
+    margin-top: 4px;
+    background: rgba(255, 77, 79, 0.15);
+    border-radius: 8px;
+    font-size: 16px;
+    gap: 6px;
+  }
+  
+  .remove-part-btn:hover {
+    background: rgba(255, 77, 79, 0.25);
+  }
+  
+  .remove-part-btn::before {
+    content: "Pašalinti";
+    font-size: 14px;
+    margin-right: 4px;
+  }
+  
+  .modal-content {
+    padding: 1rem;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .cancel-btn, .submit-btn {
+    width: 100%;
+  }
+  
+  .login-card {
+    padding: 1.5rem;
+    width: 90%;
+  }
+  
+  .login-title {
+    font-size: 1.5rem;
+  }
+  
+  /* Add part module mobile */
   .add-part-module-expanded {
     min-width: auto;
     width: 100%;
+    padding: 0.8rem;
   }
   
   .form-row {
@@ -1138,9 +1072,7 @@ body {
     width: 100%;
     padding: 12px;
   }
-}
-
-@media screen and (max-width: 480px) {
+  
   .add-part-trigger {
     width: 100%;
     justify-content: center;
@@ -1154,23 +1086,127 @@ body {
   .add-part-header h4 {
     font-size: 1.1rem;
   }
+}
+
+/* Small mobile (320px and below) */
+@media screen and (max-width: 320px) {
+  .title {
+    font-size: 1rem;
+  }
   
-  .input-wrapper input {
+  .price {
+    font-size: 1rem;
+  }
+  
+  .card {
+    padding: 10px;
+  }
+  
+  .part {
     padding: 12px;
-    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .part-info {
+    font-size: 0.9rem;
+  }
+  
+  .part-info span:last-child {
+    font-size: 1rem;
+  }
+  
+  .login-title {
+    font-size: 1.25rem;
   }
 }
 
-/* Touch-friendly */
+/* Touch-friendly adjustments for mobile */
 @media (hover: none) and (pointer: coarse) {
-  .add-part-trigger,
-  .save-btn-small,
-  .cancel-btn-small,
-  .close-btn {
+  .btn, .view-btn, .add-part-trigger, .save-btn-small, 
+  .cancel-btn-small, .submit-btn, .remove-part-btn,
+  .logout-btn-small, .close-btn, .cancel-btn {
     min-height: 48px;
+    min-width: 48px;
   }
   
-  .input-wrapper input {
-    font-size: 16px;
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+  
+  .card, .part {
+    padding: 16px;
+  }
+}
+
+/* High-resolution screens and large desktops */
+@media screen and (min-width: 1440px) {
+  .first-left {
+    width: 20vw;
+  }
+  
+  .second-left {
+    left: 20vw;
+    width: 80vw;
+  }
+  
+  .list {
+    width: calc(20vw - 16px);
+  }
+  
+  .card {
+    width: calc(20vw - 48px);
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .price {
+    font-size: 1.5rem;
+  }
+  
+  .top-bar {
+    width: 75vw;
+  }
+  
+  .parts-list {
+    width: 75vw;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+    overflow: visible;
+  }
+  
+  .first-left, .second-left {
+    position: relative;
+    width: 100%;
+    height: auto;
+    left: 0;
+    background: none;
+    backdrop-filter: none;
+  }
+  
+  .controls, .btn, .view-btn, .add-part-module, 
+  .remove-part-btn, .modal-overlay, .logout-btn-small,
+  .add-part-trigger, .add-part-module-expanded {
+    display: none !important;
+  }
+  
+  .card, .part {
+    background: white;
+    color: black;
+    border: 1px solid #ccc;
+    page-break-inside: avoid;
+  }
+  
+  .card span, .part, .part-info span {
+    color: black;
+  }
+  
+  .price {
+    color: #2e7d32;
   }
 }
