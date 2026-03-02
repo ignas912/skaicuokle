@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-import { Plus, Eye, X } from "lucide-react";
+import { Plus, Eye, X, LogOut, User } from "lucide-react";
 import AddProject from "./AddProject";
 import AddPartModule from "./AddPartModule";
 import { supabase } from "./supabaseClient";
@@ -42,6 +42,19 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Check if admin is already logged in
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("isLoggedIn");
+    if (loggedIn === "true") {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   // Fetch projects from Supabase
   const fetchProjects = async () => {
@@ -60,14 +73,102 @@ function App() {
   };
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    if (isLoggedIn) {
+      fetchProjects();
+    }
+  }, [isLoggedIn]);
 
   // Handler for adding a part to an existing project
   const handlePartAdded = () => {
     fetchProjects(); // Refresh list and selected project
   };
 
+  // Handle admin login
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      // Check credentials against the admin table
+      const { data, error } = await supabase
+        .from("admin")
+        .select("username, password")
+        .eq("id", 1)
+        .single();
+
+      if (error) throw error;
+
+      if (data && data.username === username && data.password === password) {
+        setIsLoggedIn(true);
+        localStorage.setItem("isLoggedIn", "true");
+      } else {
+        setError("Neteisingas vartotojo vardas arba slaptažodis");
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle admin logout
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setSelectedProject(null);
+    localStorage.removeItem("isLoggedIn");
+    setUsername("");
+    setPassword("");
+  };
+
+  // If not logged in, show admin login form
+  if (!isLoggedIn) {
+    return (
+      <div className="login-container">
+        <div className="login-card">
+          <h1 className="login-title">Projektų Valdymas</h1>
+          <p className="login-subtitle">Administratoriaus prisijungimas</p>
+          
+          {error && <div className="error-message">{error}</div>}
+          
+          <form onSubmit={handleLogin} className="login-form">
+            <div className="input-group">
+              <User className="input-icon" size={20} />
+              <input
+                type="text"
+                placeholder="Vartotojo vardas"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className="input-group">
+              <input
+                type="password"
+                placeholder="Slaptažodis"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              className="login-button"
+              disabled={loading}
+            >
+              {loading ? "Prisijungiama..." : "Prisijungti"}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Main app (when admin is logged in)
   return (
     <>
       <div className="first-left">
@@ -75,17 +176,27 @@ function App() {
           <div className="btn" onClick={() => setShowModal(true)}>
             <Plus />
           </div>
+          <button className="logout-btn-small" onClick={handleLogout}>
+            <LogOut size={16} />
+            Atsijungti
+          </button>
         </div>
 
         <div className="list">
-          {projects.map((item) => (
-            <div key={item.id} className="card">
-              <span>{item.project}</span>
-              <div className="view-btn" onClick={() => setSelectedProject(item)}>
-                <Eye />
-              </div>
+          {projects.length === 0 ? (
+            <div className="empty-state">
+              <p>Dar nėra projektų. Paspauskite + kad sukurtumėte pirmą projektą!</p>
             </div>
-          ))}
+          ) : (
+            projects.map((item) => (
+              <div key={item.id} className="card">
+                <span>{item.project}</span>
+                <div className="view-btn" onClick={() => setSelectedProject(item)}>
+                  <Eye />
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
@@ -107,27 +218,33 @@ function App() {
           </div>
 
           <div className="parts-list">
-            {selectedProject.parts.map((part, idx) => (
-              <div key={idx} className="part">
-                <div className="part-info">
-                  <span>{part[0]}</span>
-                  <span>{part[1]}€</span>
-                </div>
-                <button
-                  className="remove-part-btn"
-                  onClick={async () => {
-                    try {
-                      await deletePart(selectedProject.id, idx);
-                      fetchProjects();
-                    } catch (err) {
-                      console.error(err);
-                    }
-                  }}
-                >
-                  <X />
-                </button>
+            {selectedProject.parts.length === 0 ? (
+              <div className="empty-state">
+                <p>Dar nėra dalių. Pridėkite pirmą dalį!</p>
               </div>
-            ))}
+            ) : (
+              selectedProject.parts.map((part, idx) => (
+                <div key={idx} className="part">
+                  <div className="part-info">
+                    <span>{part[0]}</span>
+                    <span>{part[1]}€</span>
+                  </div>
+                  <button
+                    className="remove-part-btn"
+                    onClick={async () => {
+                      try {
+                        await deletePart(selectedProject.id, idx);
+                        fetchProjects();
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    }}
+                  >
+                    <X />
+                  </button>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}
@@ -135,7 +252,7 @@ function App() {
       {showModal && (
         <AddProject
           onClose={() => setShowModal(false)}
-          onUserAdded={fetchProjects} // refresh list after adding
+          onUserAdded={fetchProjects}
         />
       )}
     </>

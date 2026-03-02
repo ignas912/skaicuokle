@@ -1,124 +1,74 @@
 import { useState } from "react";
 import { supabase } from "./supabaseClient";
+import { X } from "lucide-react";
 
-interface Part {
-  name: string;
-  price: number;
-}
-
-interface AddProjectModalProps {
+interface AddProjectProps {
   onClose: () => void;
-  onUserAdded?: () => void;
+  onUserAdded: () => void;
 }
 
-const AddProject: React.FC<AddProjectModalProps> = ({ onClose, onUserAdded }) => {
+export default function AddProject({ onClose, onUserAdded }: AddProjectProps) {
   const [projectName, setProjectName] = useState("");
-  const [parts, setParts] = useState<Part[]>([]);
-  const [newPartName, setNewPartName] = useState("");
-  const [newPartPrice, setNewPartPrice] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleAddPart = () => {
-    if (!newPartName.trim() || !newPartPrice.trim()) return;
-    const price = parseFloat(newPartPrice);
-    if (isNaN(price)) return;
-    setParts((prev) => [...prev, { name: newPartName.trim(), price }]);
-    setNewPartName("");
-    setNewPartPrice("");
-  };
-
-  const handleRemovePart = (index: number) => {
-    setParts((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSubmit = async () => {
-    if (!projectName.trim()) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      // ✅ Insert project into Supabase
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("projects")
-        .insert([
-          { project: projectName, parts: parts.map((p) => [p.name, p.price]) }
-        ])
-        .select(); // returns the inserted row with generated ID
+        .insert([{ project: projectName, parts: [] }]);
 
-      if (error) {
-        console.error("Supabase insert error:", error);
-        return;
-      }
+      if (error) throw error;
 
-      console.log("Inserted project:", data);
-
-      // Reset form
-      setProjectName("");
-      setParts([]);
-      setNewPartName("");
-      setNewPartPrice("");
-
-      // Notify parent to refresh projects
-      onUserAdded?.();
+      onUserAdded();
       onClose();
-    } catch (err) {
-      console.error("Unexpected error:", err);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
-        <h3>Projektas pridejimas</h3>
-        <input
-          type="text"
-          value={projectName}
-          onChange={(e) => setProjectName(e.target.value)}
-          placeholder="Pavadinimas..."
-        />
-
-        <h4>Dalys</h4>
-        <div className="parts-input">
-          <input
-            type="text"
-            value={newPartName}
-            onChange={(e) => setNewPartName(e.target.value)}
-            placeholder="Pavadinimas..."
-          />
-          <input
-            type="number"
-            value={newPartPrice}
-            onChange={(e) => setNewPartPrice(e.target.value)}
-            placeholder="Sūma..."
-            min="0"
-            step="0.01"
-          />
-          <button type="button" onClick={handleAddPart}>
-            Pridėti
+      <div className="modal-content">
+        <div className="modal-header">
+          <h2>Naujas Projektas</h2>
+          <button className="close-btn" onClick={onClose}>
+            <X />
           </button>
         </div>
 
-        {parts.length > 0 && (
-          <ul>
-            {parts.map((p, idx) => (
-              <li key={idx}>
-                {p.name} – €{p.price.toFixed(2)}
-                <button type="button" onClick={() => handleRemovePart(idx)}>
-                  Pašalinti
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+        <form onSubmit={handleSubmit}>
+          {error && <div className="error-message">{error}</div>}
 
-        <div className="buttons">
-          <button type="button" onClick={handleSubmit}>
-            Pridėti
-          </button>
-          <button type="button" onClick={onClose}>
-            Atšaukti
-          </button>
-        </div>
+          <div className="form-group">
+            <label htmlFor="projectName">Projekto pavadinimas</label>
+            <input
+              type="text"
+              id="projectName"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              required
+              disabled={loading}
+              placeholder="Įveskite projekto pavadinimą"
+            />
+          </div>
+
+          <div className="modal-actions">
+            <button type="button" className="cancel-btn" onClick={onClose}>
+              Atšaukti
+            </button>
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? "Kuriama..." : "Sukurti projektą"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
-};
-
-export default AddProject;
+}
