@@ -12,6 +12,12 @@ interface AddPartModuleProps {
   onPartAdded?: () => void;
 }
 
+// Helper function to format price (keeping it consistent with main app)
+const formatPriceForStorage = (price: number): number => {
+  // Round to 2 decimal places to avoid floating point issues
+  return Math.round(price * 100) / 100;
+};
+
 const AddPartModule: React.FC<AddPartModuleProps> = ({ projectId, onPartAdded }) => {
   const [partName, setPartName] = useState("");
   const [partPrice, setPartPrice] = useState("");
@@ -31,6 +37,9 @@ const AddPartModule: React.FC<AddPartModuleProps> = ({ projectId, onPartAdded })
       return;
     }
 
+    // Round the price to 2 decimal places before saving
+    const roundedPrice = formatPriceForStorage(price);
+
     setLoading(true);
     setError("");
 
@@ -44,8 +53,8 @@ const AddPartModule: React.FC<AddPartModuleProps> = ({ projectId, onPartAdded })
       
       if (fetchError) throw fetchError;
 
-      // 2️⃣ Add new part to parts array
-      const newParts = [...(project.parts || []), [partName.trim(), price]];
+      // 2️⃣ Add new part to parts array with rounded price
+      const newParts = [...(project.parts || []), [partName.trim(), roundedPrice]];
 
       // 3️⃣ Update project in Supabase
       const { error: updateError } = await supabase
@@ -75,6 +84,24 @@ const AddPartModule: React.FC<AddPartModuleProps> = ({ projectId, onPartAdded })
     setPartName("");
     setPartPrice("");
     setError("");
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow empty string or valid number
+    if (value === "" || /^\d*\.?\d*$/.test(value)) {
+      setPartPrice(value);
+    }
+  };
+
+  const handlePriceBlur = () => {
+    if (partPrice) {
+      const numPrice = parseFloat(partPrice);
+      if (!isNaN(numPrice)) {
+        // Format to 2 decimal places when input loses focus
+        setPartPrice(numPrice.toFixed(2));
+      }
+    }
   };
 
   if (!isAdding) {
@@ -116,12 +143,12 @@ const AddPartModule: React.FC<AddPartModuleProps> = ({ projectId, onPartAdded })
           
           <div className="input-wrapper price-input">
             <input
-              type="number"
+              type="text"
+              inputMode="decimal"
               value={partPrice}
-              onChange={(e) => setPartPrice(e.target.value)}
-              placeholder="Suma"
-              min="0.01"
-              step="0.01"
+              onChange={handlePriceChange}
+              onBlur={handlePriceBlur}
+              placeholder="0.00"
               disabled={loading}
             />
             <span className="currency">€</span>

@@ -11,6 +11,12 @@ interface Project {
   parts: [string, number][];
 }
 
+// Helper function to format prices consistently (best practice for future)
+const formatPrice = (price: number): string => {
+  // Round to 2 decimal places to avoid floating point issues
+  return (Math.round(price * 100) / 100).toFixed(2);
+};
+
 // Supabase helper functions
 async function getProjects(): Promise<Project[]> {
   const { data, error } = await supabase.from("projects").select("*");
@@ -60,12 +66,20 @@ function App() {
   const fetchProjects = async () => {
     try {
       const data = await getProjects();
-      setProjects(data);
+      // Ensure all prices are properly rounded when fetching
+      const cleanedData = data.map(project => ({
+        ...project,
+        parts: project.parts.map(part => [
+          part[0],
+          Math.round(part[1] * 100) / 100 // Round to 2 decimals
+        ] as [string, number])
+      }));
+      setProjects(cleanedData);
 
-      // Keep selectedProject in sync
+      // Keep selectedProject in sync with rounded values
       if (selectedProject) {
-        const updated = data.find((p) => p.id === selectedProject.id);
-        if (updated) setSelectedProject(updated);
+        const updated = cleanedData.find((p) => p.id === selectedProject.id);
+        if (updated) setSelectedProject(updated as Project);
       }
     } catch (err) {
       console.error(err);
@@ -119,6 +133,12 @@ function App() {
     localStorage.removeItem("isLoggedIn");
     setUsername("");
     setPassword("");
+  };
+
+  // Calculate total with proper formatting
+  const calculateTotal = (parts: [string, number][]): string => {
+    const total = parts.reduce((sum, part) => sum + part[1], 0);
+    return formatPrice(total);
   };
 
   // If not logged in, show admin login form
@@ -206,7 +226,7 @@ function App() {
             <span className="title">
               {selectedProject.project}{" "}
               <div className="price">
-                {selectedProject.parts.reduce((sum, part) => sum + part[1], 0)}€
+                {calculateTotal(selectedProject.parts)}€
               </div>
             </span>
 
@@ -227,7 +247,7 @@ function App() {
                 <div key={idx} className="part">
                   <div className="part-info">
                     <span>{part[0]}</span>
-                    <span>{part[1]}€</span>
+                    <span>{formatPrice(part[1])}€</span>
                   </div>
                   <button
                     className="remove-part-btn"
